@@ -634,6 +634,83 @@
     color: var(--bronze-dim);
   }
 
+  .site-credits {
+    text-align: center;
+    margin-top: 28px;
+    padding: 20px 16px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .site-credits-tagline {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--taupe-soft);
+    font-style: italic;
+    max-width: 22rem;
+    margin: 0;
+  }
+  .site-credits-tagline a {
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 0.5px solid rgba(232,188,74,0.35);
+  }
+  .site-credits-tagline a:hover {
+    color: var(--gold-rich);
+  }
+  .site-credits-phone {
+    font-size: 15px;
+    font-family: 'Playfair Display', serif;
+    color: var(--gold);
+    text-decoration: none;
+    letter-spacing: 0.12em;
+    padding: 6px 4px;
+    transition: opacity 0.2s ease;
+  }
+  .site-credits-phone:hover {
+    opacity: 0.9;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .site-credits-phone:focus-visible {
+    outline: 1px solid rgba(232,188,74,0.45);
+    outline-offset: 3px;
+  }
+  .site-credits-link {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--bronze-dim);
+    transition: opacity 0.25s ease;
+  }
+  .site-credits-link:hover {
+    opacity: 0.88;
+  }
+  .site-credits-link:focus-visible {
+    outline: 1px solid rgba(232,188,74,0.45);
+    outline-offset: 4px;
+  }
+  .site-credits-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-style: italic;
+    color: var(--bronze-dim);
+  }
+  .site-credits-logo {
+    height: 38px;
+    width: auto;
+    max-width: 180px;
+    object-fit: contain;
+    display: block;
+  }
+  @media (max-width: 520px) {
+    .site-credits-logo { height: 32px; max-width: 150px; }
+  }
+
   .invite-page [data-aos] {
     animation: none !important;
   }
@@ -792,6 +869,15 @@
     <div class="compliments-from">With Best Compliments from</div>
     <div class="compliments-name">A.K. Family</div>
     <div class="compliments-sub">Relatives &amp; Friends</div>
+  </div>
+
+  <div class="site-credits" data-aos="fade-up" data-aos-duration="700" data-aos-delay="120">
+    <a href="https://labspace.site/" class="site-credits-link" target="_blank" rel="noopener noreferrer">
+      <span class="site-credits-label">Designed by</span>
+      <img src="labspace.png" class="site-credits-logo" alt="LabSpace Creative Agency" width="180" height="48" loading="lazy" decoding="async" />
+    </a>
+    <p class="site-credits-tagline">Get your digital invitation card from <a href="https://labspace.site/" target="_blank" rel="noopener noreferrer">LabSpace</a></p>
+    <a href="tel:+916361857581" class="site-credits-phone">+91 63618 57581</a>
   </div>
 
 </div>
