@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #e8bc4a;
+    --gold-rich: #f0c96b;
+    --gold-deep: #c9952e;
+    --bronze: #c9a06a;
+    --bronze-dim: #9d7448;
+    --taupe: #d4bc98;
+    --taupe-soft: #b89a78;
+    --champagne: #f8ead0;
+    --cream: #faf3ea;
+    --bg-deep: #0c0508;
+    --bg-mid: #140a0e;
+    --wine-glow: rgba(95, 35, 55, 0.45);
+    --ember: rgba(180, 95, 55, 0.12);
+    --gold-glow: rgba(232, 188, 74, 0.22);
+    --border-gold: rgba(232, 188, 74, 0.42);
+    --card-fill: rgba(90, 40, 55, 0.14);
+    --card-fill-hover: rgba(90, 40, 55, 0.22);
+  }
+
+  html {
+    height: auto;
+    min-height: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg-deep);
+    background-image:
+      radial-gradient(ellipse 110% 75% at 50% -8%, var(--wine-glow) 0%, transparent 58%),
+      radial-gradient(ellipse 65% 50% at 100% 25%, var(--ember) 0%, transparent 48%),
+      radial-gradient(ellipse 50% 42% at 0% 90%, rgba(45, 18, 32, 0.55) 0%, transparent 52%),
+      linear-gradient(168deg, var(--bg-mid) 0%, var(--bg-deep) 38%, #080406 100%);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: auto;
+  }
+
+  body.opening-active {
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  /* ── Intro: “break the seal” (cinematic) ── */
+  .intro-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #080306;
+    cursor: pointer;
+    touch-action: manipulation;
+    outline: none;
+    overflow: hidden;
+    transition: opacity 0.85s ease 0.55s, visibility 0s linear 1.45s;
+  }
+  .intro-overlay.is-gone {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .intro-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 38%, rgba(232,188,74,0.11) 0%, transparent 52%),
+      radial-gradient(ellipse 50% 45% at 50% 45%, rgba(75,30,45,0.42) 0%, #080306 70%);
+    pointer-events: none;
+  }
+
+  .intro-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow: inset 0 0 100px 50px rgba(0,0,0,0.75);
+    z-index: 4;
+  }
+
+  .intro-sweep {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    width: 175vmin;
+    height: 175vmin;
+    margin: -87.5vmin 0 0 -87.5vmin;
+    background: conic-gradient(
+      from 210deg,
+      transparent 0deg,
+      rgba(232,188,74,0.06) 50deg,
+      rgba(255,215,160,0.12) 72deg,
+      transparent 100deg,
+      transparent 360deg
+    );
+    animation: introSweep 14s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes introSweep {
+    to { transform: rotate(360deg); }
+  }
+
+  .intro-burst {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    width: 38vmin;
+    height: 38vmin;
+    margin: -19vmin 0 0 -19vmin;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,228,190,0.6) 0%, rgba(232,188,74,0.28) 38%, transparent 68%);
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2;
+    filter: blur(2px);
+  }
+  .intro-overlay.opened .intro-burst {
+    animation: introBurstOut 1.15s cubic-bezier(0.2, 0.85, 0.25, 1) forwards;
+  }
+  @keyframes introBurstOut {
+    0%   { transform: scale(0.2); opacity: 0.95; }
+    100% { transform: scale(16); opacity: 0; }
+  }
+
+  .intro-ring {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    width: min(98vw, 480px);
+    height: min(98vw, 480px);
+    margin: calc(min(98vw, 480px) / -2) 0 0 calc(min(98vw, 480px) / -2);
+    border-radius: 50%;
+    border: 1px solid rgba(232,188,74,0.28);
+    box-shadow:
+      0 0 90px rgba(232,188,74,0.1),
+      inset 0 0 55px rgba(120, 50, 65, 0.12);
+    pointer-events: none;
+    z-index: 3;
+    animation: introRingPulse 3.2s ease-in-out infinite;
+  }
+  @keyframes introRingPulse {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50%      { transform: scale(1.03); opacity: 1; }
+  }
+  .intro-overlay.opened .intro-ring {
+    animation: introRingExit 1s ease forwards;
+  }
+  @keyframes introRingExit {
+    to { transform: scale(1.4); opacity: 0; }
+  }
+
+  .intro-stage {
+    position: relative;
+    z-index: 5;
+    transform: scale(1.88);
+    transition: transform 1.05s cubic-bezier(0.33, 0.86, 0.36, 1) 0.15s;
+  }
+  .intro-overlay.opened .intro-stage {
+    transform: scale(0.35);
+  }
+
+  .intro-seal-float {
+    animation: introSealFloat 4s ease-in-out infinite;
+  }
+  @keyframes introSealFloat {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50%      { transform: translateY(-10px) rotate(1deg); }
+  }
+  .intro-overlay.opened .intro-seal-float {
+    animation: none;
+    transform: translateY(0) rotate(0deg);
+    transition: transform 0.25s ease;
+  }
+
+  .intro-overlay.opened .intro-seal-halves {
+    overflow: visible;
+  }
+
+  .intro-seal-halves {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin: 0 auto;
+    border-radius: 50%;
+    overflow: hidden;
+    isolation: isolate;
+    filter: drop-shadow(0 12px 28px rgba(0,0,0,0.65)) drop-shadow(0 0 45px var(--gold-glow));
+  }
+
+  .intro-half {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+  }
+  .intro-half--l { left: 0; }
+  .intro-half--r { right: 0; }
+
+  .intro-half img {
+    position: absolute;
+    top: 0;
+    width: 260px;
+    height: 260px;
+    object-fit: contain;
+    max-width: none;
+  }
+  .intro-half--l img { left: 0; }
+  .intro-half--r img { right: 0; left: auto; }
+
+  .intro-overlay.opened .intro-half--l {
+    animation: introFlyLeft 1.05s cubic-bezier(0.45, 0, 0.15, 1) 0.35s forwards;
+  }
+  .intro-overlay.opened .intro-half--r {
+    animation: introFlyRight 1.05s cubic-bezier(0.45, 0, 0.15, 1) 0.35s forwards;
+  }
+  @keyframes introFlyLeft {
+    0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; filter: brightness(1); }
+    25%  { transform: translate(2px, -4px) rotate(0deg) scale(1.04); filter: brightness(1.12); }
+    100% { transform: translate(-140%, 28%) rotate(-26deg) scale(0.88); opacity: 0; filter: brightness(0.7); }
+  }
+  @keyframes introFlyRight {
+    0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; filter: brightness(1); }
+    25%  { transform: translate(-2px, -4px) rotate(0deg) scale(1.04); filter: brightness(1.12); }
+    100% { transform: translate(140%, 28%) rotate(26deg) scale(0.88); opacity: 0; filter: brightness(0.7); }
+  }
+
+  .intro-title {
+    position: relative;
+    z-index: 6;
+    margin-top: 8px;
+    text-align: center;
+  }
+  .intro-kicker {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--bronze);
+    margin-bottom: 10px;
+  }
+  .intro-hint {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-style: italic;
+    color: var(--taupe);
+    letter-spacing: 2px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.9);
+    animation: introHintPulse 2s ease-in-out infinite;
+  }
+  @keyframes introHintPulse {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+  }
+  .intro-overlay.opened .intro-hint,
+  .intro-overlay.opened .intro-kicker {
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+
+  @media (max-width: 520px) {
+    .intro-sweep {
+      width: 195vmin;
+      height: 195vmin;
+      margin: -97.5vmin 0 0 -97.5vmin;
+    }
+    .intro-ring {
+      width: min(100vw, 420px);
+      height: min(100vw, 420px);
+      margin: calc(min(100vw, 420px) / -2) 0 0 calc(min(100vw, 420px) / -2);
+    }
+    /* Larger seal + stage zoom on phone */
+    .intro-stage { transform: scale(1.28); }
+    .intro-overlay.opened .intro-stage { transform: scale(0.42); }
+    .intro-seal-halves {
+      width: min(88vmin, 380px);
+      height: min(88vmin, 380px);
+    }
+    .intro-half img {
+      width: min(88vmin, 380px);
+      height: min(88vmin, 380px);
+    }
+  }
+
+  @media (max-width: 380px) {
+    .intro-sweep {
+      width: 210vmin;
+      height: 210vmin;
+      margin: -105vmin 0 0 -105vmin;
+    }
+    .intro-seal-halves {
+      width: min(90vmin, 400px);
+      height: min(90vmin, 400px);
+    }
+    .intro-half img {
+      width: min(90vmin, 400px);
+      height: min(90vmin, 400px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .intro-sweep,
+    .intro-ring,
+    .intro-seal-float,
+    .intro-hint {
+      animation: none !important;
+    }
+    .intro-overlay.opened .intro-burst {
+      animation: none !important;
+      opacity: 0;
+      transform: scale(12);
+    }
+    .intro-overlay.opened .intro-half--l,
+    .intro-overlay.opened .intro-half--r {
+      animation: none !important;
+      opacity: 0;
+    }
+    .intro-overlay.opened .intro-stage { transform: scale(0.9); }
+    .intro-overlay,
+    .intro-stage {
+      transition: none !important;
+    }
+  }
+
+  .invite-page {
+    position: relative;
+    z-index: 2;
+    max-width: 680px;
+    margin: 0 auto;
+    padding:
+      max(0px, env(safe-area-inset-top, 0px))
+      max(20px, env(safe-area-inset-right, 0px))
+      max(60px, env(safe-area-inset-bottom, 0px))
+      max(20px, env(safe-area-inset-left, 0px));
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    padding: 60px 20px 40px;
+    position: relative;
+  }
+
+  .bismillah {
+    font-size: clamp(26px, 5.5vw, 38px);
+    letter-spacing: 0;
+    word-spacing: 0.04em;
+    line-height: 1.85;
+    color: var(--gold);
+    margin-bottom: 12px;
+    animation: fadeDown 1.4s ease both;
+    font-family: 'Amiri', 'Noto Naskh Arabic', 'Arabic Typesetting', 'Segoe UI Historic', serif;
+    font-weight: 400;
+    font-feature-settings: 'liga' 1, 'kern' 1;
+    direction: rtl;
+    unicode-bidi: isolate;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .bismillah-sub {
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: var(--bronze-dim);
+    text-transform: uppercase;
+    animation: fadeDown 1.6s ease both;
+    margin-bottom: 40px;
+  }
+
+  .insha-allah {
+    font-style: italic;
+    font-size: 18px;
+    color: var(--gold);
+    animation: fadeDown 1.8s ease both;
+    letter-spacing: 2px;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Divider ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+    animation: fadeIn 2s ease both;
+  }
+  .divider-line { flex: 1; height: 0.5px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
+  .divider-diamond {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ── Host Card ── */
+  .host-card {
+    text-align: center;
+    padding: 40px 30px;
+    border: 0.5px solid rgba(232,188,74,0.38);
+    border-radius: 2px;
+    margin-bottom: 32px;
+    position: relative;
+    animation: fadeUp 1.6s ease both;
+    background: linear-gradient(168deg, rgba(95, 42, 58, 0.2) 0%, rgba(38, 16, 26, 0.42) 100%);
+  }
+
+  .host-card::before, .host-card::after,
+  .host-card .corner-br, .host-card .corner-tl {
+    content: '';
+    position: absolute;
+    width: 28px; height: 28px;
+    border-color: var(--gold);
+    border-style: solid;
+  }
+  .host-card::before  { top: -1px; left: -1px;  border-width: 1.5px 0 0 1.5px; }
+  .host-card::after   { top: -1px; right: -1px; border-width: 1.5px 1.5px 0 0; }
+  .host-card .corner-br { bottom: -1px; right: -1px; border-width: 0 1.5px 1.5px 0; }
+  .host-card .corner-tl { bottom: -1px; left: -1px;  border-width: 0 0 1.5px 1.5px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .host-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .host-detail {
+    font-size: 14px;
+    color: var(--bronze-dim);
+    letter-spacing: 1px;
+    font-style: italic;
+    margin-bottom: 24px;
+    line-height: 1.7;
+  }
+
+  .solicits-text {
+    font-size: 16px;
+    color: var(--taupe-soft);
+    font-style: italic;
+    line-height: 1.9;
+    margin-bottom: 24px;
+  }
+
+  /* ── Couple Names ── */
+  .couple-section {
+    text-align: center;
+    animation: fadeUp 2s ease both;
+    margin-bottom: 12px;
+  }
+
+  .groom-name {
+    font-family: 'Dancing Script', cursive;
+    font-size: 44px;
+    color: var(--gold);
+    margin-bottom: 8px;
+    text-shadow: 0 0 60px rgba(232,188,74,0.28);
+    animation: glowPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { text-shadow: 0 0 32px rgba(232,188,74,0.2); }
+    50%       { text-shadow: 0 0 72px rgba(240, 200, 110, 0.45); }
+  }
+
+  .groom-lineage {
+    font-size: 13px;
+    color: var(--bronze-dim);
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+    font-style: italic;
+    line-height: 1.7;
+  }
+
+  .with-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--bronze-dim);
+    margin: 16px 0;
+    display: block;
+  }
+
+  .bride-name {
+    font-family: 'Dancing Script', cursive;
+    font-size: 40px;
+    color: var(--gold);
+    animation: glowPulse 3s ease-in-out infinite 1.5s;
+  }
+
+  .bride-lineage {
+    font-size: 13px;
+    color: var(--bronze-dim);
+    letter-spacing: 1px;
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  /* ── Rings animation ── */
+  .rings {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin: 28px 0;
+    animation: fadeIn 2.5s ease both;
+  }
+
+  .ring {
+    width: 34px; height: 34px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    position: relative;
+    animation: ringFloat 3s ease-in-out infinite;
+  }
+  .ring:last-child { margin-left: -10px; animation-delay: 0.4s; }
+  .ring::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 0.5px solid rgba(232,188,74,0.45);
+    border-radius: 50%;
+  }
+
+  @keyframes ringFloat {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-5px); }
+  }
+
+  /* ── Events ── */
+  .events-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 32px 0;
+    animation: fadeUp 2.2s ease both;
+  }
+
+  @media (max-width: 520px) {
+    .events-section { grid-template-columns: 1fr; }
+    .groom-name { font-size: 34px; }
+    .bride-name  { font-size: 30px; }
+    .header {
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+    }
+    .bismillah {
+      font-size: clamp(20px, 5.2vw, 28px);
+      line-height: 1.9;
+      padding: 0 4px;
+    }
+    .bismillah-sub {
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .bismillah {
+      font-size: clamp(18px, 4.9vw, 24px);
+    }
+  }
+
+  .event-card {
+    border: 0.5px solid rgba(232,188,74,0.4);
+    padding: 28px 22px;
+    text-align: center;
+    background: linear-gradient(165deg, rgba(88, 40, 55, 0.22) 0%, rgba(32, 14, 22, 0.38) 100%);
+    border-radius: 2px;
+    position: relative;
+    transition: border-color 0.4s, background 0.4s;
+    cursor: default;
+  }
+
+  .event-card:hover {
+    border-color: rgba(245, 210, 130, 0.65);
+    background: linear-gradient(165deg, rgba(105, 48, 62, 0.32) 0%, rgba(42, 20, 30, 0.48) 100%);
+  }
+
+  .event-tag {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 12px;
+  }
+
+  .event-date {
+    font-size: 20px;
+    font-weight: 600;
+    font-family: 'Playfair Display', serif;
+    color: var(--champagne);
+    margin-bottom: 4px;
+  }
+
+  .event-hijri {
+    font-size: 12px;
+    color: var(--bronze-dim);
+    font-style: italic;
+    margin-bottom: 14px;
+  }
+
+  .event-time {
+    font-size: 14px;
+    color: var(--taupe-soft);
+    margin-bottom: 4px;
+  }
+
+  .event-venue {
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Playfair Display', serif;
+    color: var(--gold);
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+
+  .event-loc {
+    font-size: 12px;
+    color: var(--bronze-dim);
+    font-style: italic;
+  }
+
+  /* ── Footer ── */
+  .footer-note {
+    text-align: center;
+    padding: 20px 0 10px;
+    font-style: italic;
+    color: var(--bronze-dim);
+    font-size: 15px;
+    line-height: 1.8;
+    animation: fadeIn 3s ease both;
+  }
+
+  .compliments {
+    text-align: center;
+    margin-top: 28px;
+    padding: 24px 20px;
+    border-top: 0.5px solid rgba(232,188,74,0.28);
+    animation: fadeIn 3.2s ease both;
+  }
+
+  .compliments-from {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--bronze-dim);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-style: italic;
+  }
+
+  .compliments-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .compliments-sub {
+    font-size: 13px;
+    color: var(--bronze-dim);
+  }
+
+  /* AOS scroll animations — disable legacy entrance keyframes on same nodes */
+  .invite-page [data-aos] {
+    animation: none !important;
+  }
+
+</style>
+</head>
+<body class="opening-active">
+
+<div id="intro-overlay" class="intro-overlay" role="dialog" aria-modal="true" aria-label="Break the seal to view invitation" tabindex="0">
+  <div class="intro-sweep" aria-hidden="true"></div>
+  <div class="intro-burst" aria-hidden="true"></div>
+  <div class="intro-ring" aria-hidden="true"></div>
+  <div class="intro-vignette" aria-hidden="true"></div>
+  <div class="intro-stage">
+    <div class="intro-seal-float">
+      <div class="intro-seal-halves">
+        <div class="intro-half intro-half--l">
+          <img src="wax-stamp.png" alt="" width="260" height="260" decoding="async" />
+        </div>
+        <div class="intro-half intro-half--r">
+          <img src="wax-stamp.png" alt="" width="260" height="260" decoding="async" />
+        </div>
+      </div>
+    </div>
+    <div class="intro-title">
+      <div class="intro-kicker">Sealed with love</div>
+      <p class="intro-hint">Tap to open</p>
+    </div>
+  </div>
+</div>
+
+<div class="invite-page">
+
+  <div class="header" data-aos="fade-down" data-aos-duration="900" data-aos-easing="ease-out-cubic">
+    <div class="bismillah" lang="ar" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+    <div class="bismillah-sub">In the Name of Allah, The Most Beneficent, The Most Merciful</div>
+    <div class="insha-allah">Insha Allah</div>
+  </div>
+
+  <div class="divider" data-aos="zoom-in" data-aos-duration="700">
+    <div class="divider-line"></div>
+    <div class="divider-diamond"></div>
+    <div class="divider-line"></div>
+    <div class="divider-diamond"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="host-card" data-aos="fade-up" data-aos-duration="950" data-aos-delay="50">
+    <div class="corner-br"></div>
+    <div class="corner-tl"></div>
+    <div class="host-name">Mrs. Aysha Banu</div>
+    <div class="host-detail">
+      W/o Late U. Abdul Kunhi Master<br>
+      Boriya House, Derlakatte
+    </div>
+    <div class="solicits-text">
+      Solicits the esteemed presence of you and your family<br>
+      on the auspicious occasion of the wedding ceremony<br>
+      of my cherished son
+    </div>
+
+    <div class="couple-section">
+      <div class="groom-name">Mohammed Safeer U.A</div>
+      <div class="groom-lineage">
+        Grand S/o. Late Mammunhi Uppina &amp;<br>
+        Late Ahmed Kunhi Haji Kalletty
+      </div>
+    </div>
+
+    <div class="rings">
+      <div class="ring"></div>
+      <div class="ring"></div>
+    </div>
+
+    <span class="with-text">with</span>
+
+    <div class="couple-section">
+      <div class="bride-name">Dr. Fadma Shuhala</div>
+      <div class="bride-lineage">D/o. Aliyar Hydar, Jattipalla, Sullia</div>
+    </div>
+  </div>
+
+  <div class="divider" data-aos="fade-in" data-aos-duration="650">
+    <div class="divider-line"></div>
+    <div class="divider-diamond"></div>
+    <div class="divider-line"></div>
+    <div class="divider-diamond"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="events-section">
+    <div class="event-card" data-aos="fade-up" data-aos-duration="800" data-aos-delay="0">
+      <div class="event-tag">✦ Nikah ✦</div>
+      <div class="event-date">Friday, 15th May 2026</div>
+      <div class="event-hijri">Chand 28th Dhul Qahad Hijiri 1447</div>
+      <div class="event-time">After Asar Namaz</div>
+      <div class="event-venue">Kendra Belma Juma Masjid</div>
+      <div class="event-loc">Renjady</div>
+    </div>
+
+    <div class="event-card" data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
+      <div class="event-tag">✦ Reception ✦</div>
+      <div class="event-date">Saturday, 16th May 2026</div>
+      <div class="event-hijri">&nbsp;</div>
+      <div class="event-time">From 5:30 PM onwards</div>
+      <div class="event-venue">Keianza Garden</div>
+      <div class="event-loc">Uchila, K.C. Road, Mangaluru</div>
+    </div>
+  </div>
+
+  <div class="divider" data-aos="fade-in" data-aos-duration="650">
+    <div class="divider-line"></div>
+    <div class="divider-diamond"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="footer-note" data-aos="fade-up" data-aos-duration="850">
+    We sincerely look forward to your presence and<br>
+    heartfelt blessings on this joyous occasion
+  </div>
+
+  <div class="compliments" data-aos="fade-up" data-aos-duration="800" data-aos-delay="80">
+    <div class="compliments-from">With Best Compliments from</div>
+    <div class="compliments-name">A.K. Family</div>
+    <div class="compliments-sub">Relatives &amp; Friends</div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  (function () {
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var aosOpts = {
+      duration: 800,
+      easing: 'ease-out-cubic',
+      once: false,
+      offset: 56,
+      disable: prefersReduced
+    };
+    function startAOS() {
+      if (typeof AOS === 'undefined' || window.__aosStarted) return;
+      window.__aosStarted = true;
+      AOS.init(aosOpts);
+      AOS.refresh();
+    }
+
+    const overlay = document.getElementById('intro-overlay');
+    if (!overlay) {
+      startAOS();
+      return;
+    }
+
+    if (prefersReduced) {
+      overlay.classList.add('opened', 'is-gone');
+      document.body.classList.remove('opening-active');
+      startAOS();
+      return;
+    }
+
+    let done = false;
+    function reveal() {
+      if (done) return;
+      done = true;
+      overlay.classList.add('opened');
+      setTimeout(function () {
+        overlay.classList.add('is-gone');
+        document.body.classList.remove('opening-active');
+        startAOS();
+      }, 1780);
+    }
+    overlay.addEventListener('click', reveal);
+    overlay.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        reveal();
+      }
+    });
+    try {
+      overlay.focus({ preventScroll: true });
+    } catch (_) {}
+  })();
+</script>
+</body>
+</html>
